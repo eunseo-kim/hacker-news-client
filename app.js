@@ -1,12 +1,13 @@
-// 1. Hacker News 안의 모든 피드 가져오기
+// 1. Hacker News 피드 정보 가져오기
 const ajax = new XMLHttpRequest();
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 ajax.open("GET", NEWS_URL, false);
 ajax.send();
 const newsFeed = JSON.parse(ajax.response);
+
 let data = {};
 
-// 2. newsFeed 불러오기 (by using handlebars)
+// 2. newsFeed 불러오기
 function getNewsFeed() {
   const source = `
     <ul>
@@ -26,17 +27,15 @@ function getNewsFeed() {
     list: newsFeed,
   };
 
-  // 2-1. individual_url 프로퍼티를 list 객체에 추가하기
   for (let i = 0; i < data.list.length; i++) {
-    data.list[i].individual_url = `#/item?id=${newsFeed[i].id}`;
-    //   data.list[i].individual_url = `https://api.hnpwa.com/v0/item/${newsFeed[i].id}/json`;
+    data.list[i].individual_url = `#${newsFeed[i].id}`;
   }
 
   let template = Handlebars.compile(source);
   document.querySelector(".container").innerHTML = template(data);
 }
 
-// 3. 클릭한 글의 id를 전달해서 individual_contents 불러오기
+// 3. 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
 function getIndividualContents(id) {
   const CONTENT_URL = `https://api.hnpwa.com/v0/item/${id}/json`;
   const source = `
@@ -65,19 +64,37 @@ function getIndividualContents(id) {
   const content = JSON.parse(ajax.response);
   const comments = JSON.parse(ajax.response).comments;
   data = {
-    // 이 부분은 좀 간단하게 줄이고 싶은데..
     title: content.title,
     url: content.url,
     domain: content.domain,
     points: content.points,
     user: content.user,
     time_ago: content.time_ago,
+    individual_url: `#${id}`,
+    id: content.id,
     list: comments,
   };
 
-  console.log(content);
   let template = Handlebars.compile(source);
   document.querySelector(".container").innerHTML = template(data);
 }
 
-getIndividualContents(28180135);
+// 4. 라우터 구현하기
+// 어떤 정보를 기준으로 뉴스피드인지, 게시물 정보인지 확인할 수 있나? => url(#) 뒤에 오는 id의 유무!
+function router() {
+  // ✅error 해결 : Hash 방식으로 라우터 구현
+  const hash = location.hash.substr(1, location.hash.length);
+  if (hash === "") {
+    getNewsFeed();
+  } else {
+    getIndividualContents(hash);
+  }
+}
+
+window.addEventListener("hashchange", router);
+// error2. 뉴스피드 => 콘텐츠 화면 => title 링크 => 뒤로가기
+// 하면? 왜 뉴스피드로 되돌아올까? 콘텐츠 화면이 나와야 되는데...
+// ✅바보같이 아랫줄에 router() 대신 getNewsFeed()를 실행했다.
+// 외부 링크에서 다시 올때는 브라우저가 새로 로딩되는 것이다. 즉, router()이 실행된다.
+// 항상 첫화면(news Feed)이 출력된다는 보장은 없다!
+router();
