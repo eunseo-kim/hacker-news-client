@@ -121,8 +121,11 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 // Hacker News 피드 정보 가져오기
 var ajax = new XMLHttpRequest();
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
-var newsFeed = getData(NEWS_URL);
-var store = {}; // 데이터 가져오기
+var container = document.querySelector(".container");
+var postsPerPage = 8; // 1페이지 당 게시물 수
+
+var store = {};
+var currentPage = 1;
 
 function getData(url) {
   ajax.open("GET", url, false);
@@ -132,17 +135,25 @@ function getData(url) {
 
 
 function getNewsFeed() {
-  var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <div><a href=\"{{url}}\">{{title}} ({{domain}})</a></div>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n        </div>\n      </li>\n      {{/each}}\n    </ul>\n    ";
+  var newsFeed = getData(NEWS_URL);
+  var lastPage = newsFeed.length / postsPerPage;
+  var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <div><a href=\"{{url}}\">{{title}} ({{domain}})</a></div>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n        </div>\n      </li>\n      {{/each}}\n    </ul> \n    <div class=\"page\">\n        <span><a href=\"#news?p={{prev_page}}\">Prev</a></span>\n        <span><a href=\"#news?p={{next_page}}\">Next</a></span>\n    </div>\n    ";
   store = {
-    list: newsFeed
-  };
+    list: newsFeed.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage),
+    // 이전 페이지, 다음 페이지 구현(삼항 조건 연산자 사용)
+    prev_page: currentPage > 1 ? currentPage - 1 : currentPage,
+    next_page: currentPage < lastPage ? currentPage + 1 : lastPage
+  }; // ✅postsPerPage이 나누어떨어지는 숫자가 아닐때, 마지막 페이지 출력되지 않는 error 해결
+  // ✅i < newsFeed.length로 잘못 구현함.
+  // newsFeed를 slice 해서 이미 새로운(index도 새로워짐) newsFeed 배열을 만들었으므로,
+  // 이제는 newsFeed 대신 store.list를 사용해야 된다.
 
   for (var i = 0; i < store.list.length; i++) {
-    store.list[i].individual_url = "#".concat(newsFeed[i].id);
+    store.list[i].individual_url = "#item?id=".concat(store.list[i].id);
   }
 
   var template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(store);
+  container.innerHTML = template(store);
 } // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
 
 
@@ -160,7 +171,7 @@ function getIndividualContents(id) {
     comments_count: contents.comments_count
   };
   var template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(store); // comments의 html을 ul의 innerHTML으로 넣기
+  container.innerHTML = template(store); // comments의 html을 ul의 innerHTML으로 넣기
 
   function makeComments(comments) {
     var called = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -182,12 +193,16 @@ function getIndividualContents(id) {
 
 
 function router() {
-  var hash = location.hash.substr(1, location.hash.length);
+  var hash = location.hash;
 
   if (hash === "") {
     getNewsFeed();
+  } else if (hash.substr(1, 7) === "news?p=") {
+    // currentPage 갱신
+    currentPage = Number(hash.substr(8));
+    getNewsFeed();
   } else {
-    getIndividualContents(hash);
+    getIndividualContents(hash.substr(9, location.hash.length));
   }
 }
 
@@ -221,7 +236,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63823" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54241" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

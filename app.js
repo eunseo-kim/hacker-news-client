@@ -1,10 +1,11 @@
 // Hacker News 피드 정보 가져오기
 const ajax = new XMLHttpRequest();
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
-const newsFeed = getData(NEWS_URL);
+const container = document.querySelector(".container");
+const postsPerPage = 8; // 1페이지 당 게시물 수
 let store = {};
+let currentPage = 1;
 
-// 데이터 가져오기
 function getData(url) {
   ajax.open("GET", url, false);
   ajax.send();
@@ -13,6 +14,9 @@ function getData(url) {
 
 // newsFeed 불러오기
 function getNewsFeed() {
+  const newsFeed = getData(NEWS_URL);
+  const lastPage = newsFeed.length / postsPerPage;
+
   const source = `
     <ul>
       {{#each list}}
@@ -24,19 +28,30 @@ function getNewsFeed() {
         </div>
       </li>
       {{/each}}
-    </ul>
+    </ul> 
+    <div class="page">
+        <span><a href="#news?p={{prev_page}}">Prev</a></span>
+        <span><a href="#news?p={{next_page}}">Next</a></span>
+    </div>
     `;
 
   store = {
-    list: newsFeed,
+    list: newsFeed.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage),
+    // 이전 페이지, 다음 페이지 구현(삼항 조건 연산자 사용)
+    prev_page: currentPage > 1 ? currentPage - 1 : currentPage,
+    next_page: currentPage < lastPage ? currentPage + 1 : lastPage,
   };
 
+  // ✅postsPerPage이 나누어떨어지는 숫자가 아닐때, 마지막 페이지 출력되지 않는 error 해결
+  // ✅i < newsFeed.length로 잘못 구현함.
+  // newsFeed를 slice 해서 이미 새로운(index도 새로워짐) newsFeed 배열을 만들었으므로,
+  // 이제는 newsFeed 대신 store.list를 사용해야 된다.
   for (let i = 0; i < store.list.length; i++) {
-    store.list[i].individual_url = `#${newsFeed[i].id}`;
+    store.list[i].individual_url = `#item?id=${store.list[i].id}`;
   }
 
   let template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(store);
+  container.innerHTML = template(store);
 }
 
 // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
@@ -71,7 +86,7 @@ function getIndividualContents(id) {
   };
 
   const template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(store);
+  container.innerHTML = template(store);
 
   // comments의 html을 ul의 innerHTML으로 넣기
   function makeComments(comments, called = 0) {
@@ -95,11 +110,15 @@ function getIndividualContents(id) {
 
 // 라우터 구현
 function router() {
-  const hash = location.hash.substr(1, location.hash.length);
+  const hash = location.hash;
   if (hash === "") {
     getNewsFeed();
+  } else if (hash.substr(1, 7) === "news?p=") {
+    // currentPage 갱신
+    currentPage = Number(hash.substr(8));
+    getNewsFeed();
   } else {
-    getIndividualContents(hash);
+    getIndividualContents(hash.substr(9, location.hash.length));
   }
 }
 window.addEventListener("hashchange", router);
