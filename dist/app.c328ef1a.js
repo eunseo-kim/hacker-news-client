@@ -118,13 +118,18 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.js":[function(require,module,exports) {
-// 1. Hacker News 피드 정보 가져오기
+// Hacker News 피드 정보 가져오기
 var ajax = new XMLHttpRequest();
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
-ajax.open("GET", NEWS_URL, false);
-ajax.send();
-var newsFeed = JSON.parse(ajax.response);
-var data = {}; // 2. newsFeed 불러오기
+var newsFeed = getData(NEWS_URL);
+var data = {}; // 데이터 가져오기
+
+function getData(url) {
+  ajax.open("GET", url, false);
+  ajax.send();
+  return JSON.parse(ajax.response);
+} // newsFeed 불러오기
+
 
 function getNewsFeed() {
   var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <div><a href=\"{{url}}\">{{title}} ({{domain}})</a></div>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n        </div>\n      </li>\n      {{/each}}\n    </ul>\n    ";
@@ -138,36 +143,46 @@ function getNewsFeed() {
 
   var template = Handlebars.compile(source);
   document.querySelector(".container").innerHTML = template(data);
-} // 3. 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
+} // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
 
 
 function getIndividualContents(id) {
   var CONTENT_URL = "https://api.hnpwa.com/v0/item/".concat(id, "/json");
-  var source = "\n  <div class=\"title\">\n    <h1>\n      <a href=\"{{url}}\">{{title}} ({{domain}})</a>\n    </h1>\n    <div>\n      <span>{{points}} points by {{user}} {{time_ago}}</span>\n      <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n    </div>\n  </div>\n  <ul>\n    {{#each list}}\n    <li>\n      <div>{{user}} {{time_ago}}</div>\n      <div>{{content}}</div>\n    </li>\n    {{/each}}\n  </ul>\n  "; // error: 왜 data = { content }; 는 되지 않을까?
-
-  ajax.open("GET", CONTENT_URL, false);
-  ajax.send();
-  var content = JSON.parse(ajax.response);
-  var comments = JSON.parse(ajax.response).comments;
+  var source = "\n  <div class=\"title\">\n    <h1>\n      <a href=\"{{url}}\">{{title}} ({{domain}})</a>\n    </h1>\n    <div>\n      <span>{{points}} points</span>\n      <span>by {{user}}</span>\n      <span>{{time_ago}}</span>\n      <span>{{comments_count}} comments</span>\n    </div>\n  </div>\n\n  <ul>\n  </ul>\n  ";
+  var contents = getData(CONTENT_URL);
   data = {
-    title: content.title,
-    url: content.url,
-    domain: content.domain,
-    points: content.points,
-    user: content.user,
-    time_ago: content.time_ago,
-    individual_url: "#".concat(id),
-    id: content.id,
-    list: comments
+    title: contents.title,
+    url: contents.url,
+    domain: contents.domain,
+    points: contents.points,
+    user: contents.user,
+    time_ago: contents.time_ago,
+    comments_count: contents.comments_count
   };
   var template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(data);
-} // 4. 라우터 구현하기
-// 어떤 정보를 기준으로 뉴스피드인지, 게시물 정보인지 확인할 수 있나? => url(#) 뒤에 오는 id의 유무!
+  document.querySelector(".container").innerHTML = template(data); // comments에 대댓글 template 넣기
+
+  function makeComments(comments) {
+    var called = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var commentString = []; // 대댓글에는 ${called}rem 만큼 padding-left
+
+    for (var i = 0; i < comments.length; i++) {
+      commentString.push("\n        <li>\n          <div style = \"padding-left: ".concat(called * 2.5, "rem\"}>").concat(comments[i].user, " ").concat(comments[i].time_ago, "</div>\n          <div style = \"padding-left: ").concat(called * 2.5, "rem\">").concat(comments[i].content, "</div>\n        </li> \n    "));
+
+      if (comments[i].comments_count > 0) {
+        commentString.push(makeComments(comments[i].comments, called + 1));
+      }
+    }
+
+    return commentString.join("");
+  }
+
+  comment_list = makeComments(contents.comments);
+  document.querySelector(".container ul").innerHTML = comment_list;
+} // 라우터 구현
 
 
 function router() {
-  // ✅error 해결 : Hash 방식으로 라우터 구현
   var hash = location.hash.substr(1, location.hash.length);
 
   if (hash === "") {
@@ -177,12 +192,7 @@ function router() {
   }
 }
 
-window.addEventListener("hashchange", router); // error2. 뉴스피드 => 콘텐츠 화면 => title 링크 => 뒤로가기
-// 하면? 왜 뉴스피드로 되돌아올까? 콘텐츠 화면이 나와야 되는데...
-// ✅바보같이 아랫줄에 router() 대신 getNewsFeed()를 실행했다.
-// 외부 링크에서 다시 올때는 브라우저가 새로 로딩되는 것이다. 즉, router()이 실행된다.
-// 항상 첫화면(news Feed)이 출력된다는 보장은 없다!
-
+window.addEventListener("hashchange", router);
 router();
 },{}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
