@@ -122,7 +122,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var ajax = new XMLHttpRequest();
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 var newsFeed = getData(NEWS_URL);
-var data = {}; // 데이터 가져오기
+var store = {}; // 데이터 가져오기
 
 function getData(url) {
   ajax.open("GET", url, false);
@@ -133,24 +133,24 @@ function getData(url) {
 
 function getNewsFeed() {
   var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <div><a href=\"{{url}}\">{{title}} ({{domain}})</a></div>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n        </div>\n      </li>\n      {{/each}}\n    </ul>\n    ";
-  data = {
+  store = {
     list: newsFeed
   };
 
-  for (var i = 0; i < data.list.length; i++) {
-    data.list[i].individual_url = "#".concat(newsFeed[i].id);
+  for (var i = 0; i < store.list.length; i++) {
+    store.list[i].individual_url = "#".concat(newsFeed[i].id);
   }
 
   var template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(data);
+  document.querySelector(".container").innerHTML = template(store);
 } // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
 
 
 function getIndividualContents(id) {
   var CONTENT_URL = "https://api.hnpwa.com/v0/item/".concat(id, "/json");
-  var source = "\n  <div class=\"title\">\n    <h1>\n      <a href=\"{{url}}\">{{title}} ({{domain}})</a>\n    </h1>\n    <div>\n      <span>{{points}} points</span>\n      <span>by {{user}}</span>\n      <span>{{time_ago}}</span>\n      <span>{{comments_count}} comments</span>\n    </div>\n  </div>\n\n  <ul>\n  </ul>\n  ";
   var contents = getData(CONTENT_URL);
-  data = {
+  var source = "\n  <div class=\"title\">\n    <h1>\n      <a href=\"{{url}}\">{{title}} ({{domain}})</a>\n    </h1>\n    <div>\n      <span>{{points}} points</span>\n      <span>by {{user}}</span>\n      <span>{{time_ago}}</span>\n      <span>{{comments_count}} comments</span>\n    </div>\n  </div>\n\n  <ul>\n  </ul>\n  ";
+  store = {
     title: contents.title,
     url: contents.url,
     domain: contents.domain,
@@ -160,11 +160,11 @@ function getIndividualContents(id) {
     comments_count: contents.comments_count
   };
   var template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(data); // comments에 대댓글 template 넣기
+  document.querySelector(".container").innerHTML = template(store); // comments의 html을 ul의 innerHTML으로 넣기
 
   function makeComments(comments) {
     var called = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var commentString = []; // 대댓글에는 ${called}rem 만큼 padding-left
+    var commentString = [];
 
     for (var i = 0; i < comments.length; i++) {
       commentString.push("\n        <li>\n          <div style = \"padding-left: ".concat(called * 2.5, "rem\"}>").concat(comments[i].user, " ").concat(comments[i].time_ago, "</div>\n          <div style = \"padding-left: ").concat(called * 2.5, "rem\">").concat(comments[i].content, "</div>\n        </li> \n    "));
@@ -177,8 +177,7 @@ function getIndividualContents(id) {
     return commentString.join("");
   }
 
-  comment_list = makeComments(contents.comments);
-  document.querySelector(".container ul").innerHTML = comment_list;
+  document.querySelector(".container ul").innerHTML = makeComments(contents.comments);
 } // 라우터 구현
 
 

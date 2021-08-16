@@ -2,13 +2,12 @@
 const ajax = new XMLHttpRequest();
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 const newsFeed = getData(NEWS_URL);
-let data = {};
+let store = {};
 
 // 데이터 가져오기
 function getData(url) {
   ajax.open("GET", url, false);
   ajax.send();
-
   return JSON.parse(ajax.response);
 }
 
@@ -28,21 +27,22 @@ function getNewsFeed() {
     </ul>
     `;
 
-  data = {
+  store = {
     list: newsFeed,
   };
 
-  for (let i = 0; i < data.list.length; i++) {
-    data.list[i].individual_url = `#${newsFeed[i].id}`;
+  for (let i = 0; i < store.list.length; i++) {
+    store.list[i].individual_url = `#${newsFeed[i].id}`;
   }
 
   let template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(data);
+  document.querySelector(".container").innerHTML = template(store);
 }
 
 // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
 function getIndividualContents(id) {
   const CONTENT_URL = `https://api.hnpwa.com/v0/item/${id}/json`;
+  const contents = getData(CONTENT_URL);
   const source = `
   <div class="title">
     <h1>
@@ -60,9 +60,7 @@ function getIndividualContents(id) {
   </ul>
   `;
 
-  const contents = getData(CONTENT_URL);
-
-  data = {
+  store = {
     title: contents.title,
     url: contents.url,
     domain: contents.domain,
@@ -72,13 +70,12 @@ function getIndividualContents(id) {
     comments_count: contents.comments_count,
   };
 
-  let template = Handlebars.compile(source);
-  document.querySelector(".container").innerHTML = template(data);
+  const template = Handlebars.compile(source);
+  document.querySelector(".container").innerHTML = template(store);
 
-  // comments에 대댓글 template 넣기
+  // comments의 html을 ul의 innerHTML으로 넣기
   function makeComments(comments, called = 0) {
     const commentString = [];
-    // 대댓글에는 ${called}rem 만큼 padding-left
     for (let i = 0; i < comments.length; i++) {
       commentString.push(`
         <li>
@@ -86,7 +83,6 @@ function getIndividualContents(id) {
           <div style = "padding-left: ${called * 2.5}rem">${comments[i].content}</div>
         </li> 
     `);
-
       if (comments[i].comments_count > 0) {
         commentString.push(makeComments(comments[i].comments, called + 1));
       }
@@ -94,8 +90,7 @@ function getIndividualContents(id) {
     return commentString.join("");
   }
 
-  comment_list = makeComments(contents.comments);
-  document.querySelector(".container ul").innerHTML = comment_list;
+  document.querySelector(".container ul").innerHTML = makeComments(contents.comments);
 }
 
 // 라우터 구현
@@ -107,6 +102,5 @@ function router() {
     getIndividualContents(hash);
   }
 }
-
 window.addEventListener("hashchange", router);
 router();
