@@ -15,7 +15,7 @@ function getData(url) {
 // newsFeed 불러오기
 function getNewsFeed() {
   const newsFeed = getData(NEWS_URL);
-  const lastPage = newsFeed.length / postsPerPage;
+  const lastPage = parseInt(newsFeed.length / postsPerPage);
 
   const source = `
     <ul>

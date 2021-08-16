@@ -136,7 +136,7 @@ function getData(url) {
 
 function getNewsFeed() {
   var newsFeed = getData(NEWS_URL);
-  var lastPage = newsFeed.length / postsPerPage;
+  var lastPage = parseInt(newsFeed.length / postsPerPage);
   var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <div><a href=\"{{url}}\">{{title}} ({{domain}})</a></div>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n        </div>\n      </li>\n      {{/each}}\n    </ul> \n    <div class=\"page\">\n        <span><a href=\"#news?p={{prev_page}}\">Prev</a></span>\n        <span><a href=\"#news?p={{next_page}}\">Next</a></span>\n    </div>\n    ";
   store = {
     list: newsFeed.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage),
