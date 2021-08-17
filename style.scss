@@ -1,0 +1,138 @@
+html,
+body {
+  margin: 0;
+  font-family: "Source Sans Pro", sans-serif;
+  background-color: #f4f3f9;
+  a {
+    text-decoration: none;
+    color: black;
+    &:visited {
+      text-decoration: none;
+    }
+    &:hover {
+      text-decoration: none;
+    }
+    &:focus {
+      text-decoration: none;
+    }
+    &:hover,
+    a:active {
+      text-decoration: none;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+}
+
+header {
+  h1 {
+    margin: 0 auto;
+    padding: 1rem;
+    font-size: 2rem;
+    i {
+      padding-right: 0.3rem;
+    }
+  }
+  a {
+    color: #3a0fc0;
+  }
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.container {
+  padding: 1rem;
+  li {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    margin: 1rem;
+    border-radius: 4px;
+    transition: all 0.3s ease-in;
+    &:hover {
+      box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    }
+  }
+
+  h3 {
+    margin: 0.3rem;
+    a {
+      color: #6334f6;
+      &:hover {
+        text-decoration: underline;
+      }
+      &:visited {
+        color: #8b6eec;
+      }
+    }
+  }
+
+  div {
+    display: inline-block;
+    color: #9c8fc0;
+    #comments {
+      background-color: #e4dcf9;
+      color: #684abb;
+      padding: 0.2rem 0.5rem;
+      border-radius: 1rem;
+      transition: all 0.2s ease-in;
+
+      i {
+        padding-right: 0.3rem;
+      }
+    }
+
+    #comments:hover {
+      box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+    }
+  }
+
+  .page {
+    width: 100%;
+    margin-bottom: 4rem;
+    display: flex;
+    justify-content: center;
+
+    a {
+      font-size: 1.2rem;
+      font-weight: bolder;
+      padding: 0.5rem 3rem;
+      margin: 1rem 0.5rem;
+      background-color: #e4dcf9;
+      border-radius: 8px;
+      &:hover {
+        background-color: #684abb;
+        color: #e4dcf9;
+      }
+    }
+  }
+
+  // comments-list
+  .title h1 a:hover {
+    text-decoration: underline;
+  }
+  #comments-list {
+    font-family: "PT Sans", sans-serif;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      background-color: #f4f3f9;
+      margin: 0;
+      &:hover {
+        box-shadow: none;
+      }
+      div p {
+        margin: 0;
+        color: #171420;
+      }
+      #comment-info {
+        color: #8774c5;
+        i {
+          padding-right: 0.3rem;
+        }
+      }
+    }
+  }
+}

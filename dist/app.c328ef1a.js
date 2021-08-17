@@ -137,7 +137,7 @@ function getData(url) {
 function getNewsFeed() {
   var newsFeed = getData(NEWS_URL);
   var lastPage = parseInt(newsFeed.length / postsPerPage) + 1;
-  var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <div><a href=\"{{url}}\">{{title}} ({{domain}})</a></div>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <span><a href=\"{{individual_url}}\">{{comments_count}} comments</a></span>\n        </div>\n      </li>\n      {{/each}}\n    </ul> \n    <div class=\"page\">\n        <span><a href=\"#news?p={{prev_page}}\">Prev</a></span>\n        <span><a href=\"#news?p={{next_page}}\">Next</a></span>\n    </div>\n    ";
+  var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <h3><a href=\"{{url}}\">{{title}} ({{domain}})</a></h3>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <a href=\"{{individual_url}}\"><div id=\"comments\"><i class=\"far fa-comment\"></i>{{comments_count}} comments</div></a>\n        </div>\n      </li>\n      {{/each}}\n    </ul> \n    <div class=\"page\">\n        <a href=\"#news?p={{prev_page}}\"><span>Prev</span></a>\n        <a href=\"#news?p={{next_page}}\"><span>Next</span></a>\n    </div>\n    ";
   store = {
     list: newsFeed.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage),
     // 이전 페이지, 다음 페이지 구현(삼항 조건 연산자 사용)
@@ -160,7 +160,7 @@ function getNewsFeed() {
 function getIndividualContents(id) {
   var CONTENT_URL = "https://api.hnpwa.com/v0/item/".concat(id, "/json");
   var contents = getData(CONTENT_URL);
-  var source = "\n  <div class=\"title\">\n    <h1>\n      <a href=\"{{url}}\">{{title}} ({{domain}})</a>\n    </h1>\n    <div>\n      <span>{{points}} points</span>\n      <span>by {{user}}</span>\n      <span>{{time_ago}}</span>\n      <span>{{comments_count}} comments</span>\n    </div>\n  </div>\n\n  <ul>\n  </ul>\n  ";
+  var source = "\n  <div class=\"title\">\n    <h1>\n      <a href=\"{{url}}\">{{title}} ({{domain}})</a>\n    </h1>\n    <div>\n    <span>{{points}} points by {{user}} {{time_ago}}</span>\n    <div id=\"comments\"><i class=\"far fa-comment\"></i>{{comments_count}} comments</div>\n    </div>\n  </div>\n\n  <ul id=\"comments-list\">\n  </ul>\n  ";
   store = {
     title: contents.title,
     url: contents.url,
@@ -178,7 +178,7 @@ function getIndividualContents(id) {
     var commentString = [];
 
     for (var i = 0; i < comments.length; i++) {
-      commentString.push("\n        <li>\n          <div style = \"padding-left: ".concat(called * 2.5, "rem\"}>").concat(comments[i].user, " ").concat(comments[i].time_ago, "</div>\n          <div style = \"padding-left: ").concat(called * 2.5, "rem\">").concat(comments[i].content, "</div>\n        </li> \n    "));
+      commentString.push("\n        <li>\n          <div id=\"comment-info\" style = \"padding-left: ".concat(called * 2.5, "rem\"}><i class=\"far fa-comment-alt\"></i>").concat(comments[i].user, " ").concat(comments[i].time_ago, "</div>\n          <div style = \"padding-left: ").concat(called * 2.5, "rem\">").concat(comments[i].content, "</div>\n        </li> \n    "));
 
       if (comments[i].comments_count > 0) {
         commentString.push(makeComments(comments[i].comments, called + 1));
@@ -236,7 +236,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54241" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54505" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

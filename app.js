@@ -21,17 +21,17 @@ function getNewsFeed() {
     <ul>
       {{#each list}}
       <li>
-        <div><a href="{{url}}">{{title}} ({{domain}})</a></div>
+        <h3><a href="{{url}}">{{title}} ({{domain}})</a></h3>
         <div>
           <span>{{points}} points by {{user}} {{time_ago}}</span>
-          <span><a href="{{individual_url}}">{{comments_count}} comments</a></span>
+          <a href="{{individual_url}}"><div id="comments"><i class="far fa-comment"></i>{{comments_count}} comments</div></a>
         </div>
       </li>
       {{/each}}
     </ul> 
     <div class="page">
-        <span><a href="#news?p={{prev_page}}">Prev</a></span>
-        <span><a href="#news?p={{next_page}}">Next</a></span>
+        <a href="#news?p={{prev_page}}"><span>Prev</span></a>
+        <a href="#news?p={{next_page}}"><span>Next</span></a>
     </div>
     `;
 
@@ -64,14 +64,12 @@ function getIndividualContents(id) {
       <a href="{{url}}">{{title}} ({{domain}})</a>
     </h1>
     <div>
-      <span>{{points}} points</span>
-      <span>by {{user}}</span>
-      <span>{{time_ago}}</span>
-      <span>{{comments_count}} comments</span>
+    <span>{{points}} points by {{user}} {{time_ago}}</span>
+    <div id="comments"><i class="far fa-comment"></i>{{comments_count}} comments</div>
     </div>
   </div>
 
-  <ul>
+  <ul id="comments-list">
   </ul>
   `;
 
@@ -94,7 +92,7 @@ function getIndividualContents(id) {
     for (let i = 0; i < comments.length; i++) {
       commentString.push(`
         <li>
-          <div style = "padding-left: ${called * 2.5}rem"}>${comments[i].user} ${comments[i].time_ago}</div>
+          <div id="comment-info" style = "padding-left: ${called * 2.5}rem"}><i class="far fa-comment-alt"></i>${comments[i].user} ${comments[i].time_ago}</div>
           <div style = "padding-left: ${called * 2.5}rem">${comments[i].content}</div>
         </li> 
     `);
