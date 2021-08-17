@@ -1,0 +1,138 @@
+html,
+body {
+  margin: 0;
+  font-family: "Source Sans Pro", sans-serif;
+  background-color: #f4f3f9;
+}
+html a,
+body a {
+  text-decoration: none;
+  color: black;
+}
+html a:visited,
+body a:visited {
+  text-decoration: none;
+}
+html a:hover,
+body a:hover {
+  text-decoration: none;
+}
+html a:focus,
+body a:focus {
+  text-decoration: none;
+}
+html a:hover,
+html a a:active,
+body a:hover,
+body a a:active {
+  text-decoration: none;
+}
+html ul,
+body ul {
+  list-style: none;
+  padding: 0;
+}
+
+header {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+header h1 {
+  margin: 0 auto;
+  padding: 1rem;
+  font-size: 2rem;
+}
+header h1 i {
+  padding-right: 0.3rem;
+}
+header a {
+  color: #3a0fc0;
+}
+
+.container {
+  padding: 1rem;
+}
+.container li {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  margin: 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease-in;
+}
+.container li:hover {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.container h3 {
+  margin: 0.3rem;
+}
+.container h3 a {
+  color: #6334f6;
+}
+.container h3 a:hover {
+  text-decoration: underline;
+}
+.container h3 a:visited {
+  color: #8b6eec;
+}
+.container div {
+  display: inline-block;
+  color: #9c8fc0;
+}
+.container div #comments {
+  background-color: #e4dcf9;
+  color: #684abb;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+  transition: all 0.2s ease-in;
+}
+.container div #comments i {
+  padding-right: 0.3rem;
+}
+.container div #comments:hover {
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+.container .page {
+  width: 100%;
+  margin-bottom: 4rem;
+  display: flex;
+  justify-content: center;
+}
+.container .page a {
+  font-size: 1.2rem;
+  font-weight: bolder;
+  padding: 0.5rem 3rem;
+  margin: 1rem 0.5rem;
+  background-color: #e4dcf9;
+  border-radius: 8px;
+}
+.container .page a:hover {
+  background-color: #684abb;
+  color: #e4dcf9;
+}
+.container .title h1 a:hover {
+  text-decoration: underline;
+}
+.container #comments-list {
+  font-family: "PT Sans", sans-serif;
+}
+.container #comments-list li {
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f3f9;
+  margin: 0;
+}
+.container #comments-list li:hover {
+  box-shadow: none;
+}
+.container #comments-list li div p {
+  margin: 0;
+  color: #171420;
+}
+.container #comments-list li #comment-info {
+  color: #8774c5;
+}
+.container #comments-list li #comment-info i {
+  padding-right: 0.3rem;
+}
+
+
+/*# sourceMappingURL=/style.e308ff8e.css.map */
