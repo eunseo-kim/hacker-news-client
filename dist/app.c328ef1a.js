@@ -122,7 +122,8 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var ajax = new XMLHttpRequest();
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 var container = document.querySelector(".container");
-var postsPerPage = 8; // 1페이지 당 게시물 수
+var header = document.querySelector("header");
+var postsPerPage = 5; // 1페이지 당 게시물 수
 
 var store = {};
 var currentPage = 1;
@@ -136,17 +137,14 @@ function getData(url) {
 
 function getNewsFeed() {
   var newsFeed = getData(NEWS_URL);
-  var lastPage = parseInt(newsFeed.length / postsPerPage) + 1;
+  var lastPage = newsFeed.length % postsPerPage === 0 ? parseInt(newsFeed.length / postsPerPage) : parseInt(newsFeed.length / postsPerPage) + 1;
   var source = "\n    <ul>\n      {{#each list}}\n      <li>\n        <h3><a href=\"{{url}}\">{{title}} ({{domain}})</a></h3>\n        <div>\n          <span>{{points}} points by {{user}} {{time_ago}}</span>\n          <a href=\"{{individual_url}}\"><div id=\"comments\"><i class=\"far fa-comment\"></i>{{comments_count}} comments</div></a>\n        </div>\n      </li>\n      {{/each}}\n    </ul> \n    <div class=\"page\">\n        <a href=\"#news?p={{prev_page}}\"><span>Prev</span></a>\n        <a href=\"#news?p={{next_page}}\"><span>Next</span></a>\n    </div>\n    ";
   store = {
     list: newsFeed.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage),
     // 이전 페이지, 다음 페이지 구현(삼항 조건 연산자 사용)
     prev_page: currentPage > 1 ? currentPage - 1 : currentPage,
     next_page: currentPage < lastPage ? currentPage + 1 : lastPage
-  }; // ✅postsPerPage이 나누어떨어지는 숫자가 아닐때, 마지막 페이지 출력되지 않는 error 해결
-  // ✅i < newsFeed.length로 잘못 구현함.
-  // newsFeed를 slice 해서 이미 새로운(index도 새로워짐) newsFeed 배열을 만들었으므로,
-  // 이제는 newsFeed 대신 store.list를 사용해야 된다.
+  };
 
   for (var i = 0; i < store.list.length; i++) {
     store.list[i].individual_url = "#item?id=".concat(store.list[i].id);
@@ -154,6 +152,7 @@ function getNewsFeed() {
 
   var template = Handlebars.compile(source);
   container.innerHTML = template(store);
+  header.innerHTML = "\n  <h1>\n    <a href=\"\"><i class=\"fab fa-hacker-news-square\"></i>Hacker News</a>\n  </h1>";
 } // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
 
 
@@ -178,7 +177,7 @@ function getIndividualContents(id) {
     var commentString = [];
 
     for (var i = 0; i < comments.length; i++) {
-      commentString.push("\n        <li>\n          <div id=\"comment-info\" style = \"padding-left: ".concat(called * 2.5, "rem\"}><i class=\"far fa-comment-alt\"></i>").concat(comments[i].user, " ").concat(comments[i].time_ago, "</div>\n          <div style = \"padding-left: ").concat(called * 2.5, "rem\">").concat(comments[i].content, "</div>\n        </li> \n    "));
+      commentString.push("\n        <li>\n          <div id=\"comment-info\" style = \"padding-left: ".concat(called * 1.5, "rem\"}><i class=\"far fa-comment-alt\"></i>").concat(comments[i].user, " ").concat(comments[i].time_ago, "</div>\n          <div style = \"padding-left: ").concat(called * 1.5, "rem\">").concat(comments[i].content, "</div>\n        </li> \n    "));
 
       if (comments[i].comments_count > 0) {
         commentString.push(makeComments(comments[i].comments, called + 1));
@@ -189,6 +188,7 @@ function getIndividualContents(id) {
   }
 
   document.querySelector(".container ul").innerHTML = makeComments(contents.comments);
+  header.innerHTML = "\n    <h1>\n      <a href=\"\"><i class=\"fab fa-hacker-news-square\"></i>Hacker News</a>\n    </h1>\n    <div title=\"\uB4A4\uB85C\uAC00\uAE30\">\n      <a href=\"#\"><i class=\"fas fa-arrow-circle-left\"></i></a>\n    </div>\n  ";
 } // 라우터 구현
 
 

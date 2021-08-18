@@ -22,8 +22,8 @@ body a:focus {
   text-decoration: none;
 }
 html a:hover,
-html a a:active,
 body a:hover,
+html a a:active,
 body a a:active {
   text-decoration: none;
 }
@@ -32,22 +32,30 @@ body ul {
   list-style: none;
   padding: 0;
 }
-
 header {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  display: flex;
+  justify-content: space-between;
 }
-header h1 {
-  margin: 0 auto;
+header h1,
+header div {
+  margin: 0;
   padding: 1rem;
   font-size: 2rem;
 }
-header h1 i {
+header h1 i,
+header div i {
   padding-right: 0.3rem;
 }
 header a {
   color: #3a0fc0;
 }
-
+header div a i {
+  transition: all 0.3s ease-in;
+}
+header div a i:hover {
+  color: #7251d4;
+}
 .container {
   padding: 1rem;
 }

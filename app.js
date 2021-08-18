@@ -2,7 +2,8 @@
 const ajax = new XMLHttpRequest();
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 const container = document.querySelector(".container");
-const postsPerPage = 8; // 1페이지 당 게시물 수
+const header = document.querySelector("header");
+const postsPerPage = 5; // 1페이지 당 게시물 수
 let store = {};
 let currentPage = 1;
 
@@ -15,7 +16,7 @@ function getData(url) {
 // newsFeed 불러오기
 function getNewsFeed() {
   const newsFeed = getData(NEWS_URL);
-  const lastPage = parseInt(newsFeed.length / postsPerPage) + 1;
+  const lastPage = newsFeed.length % postsPerPage === 0 ? parseInt(newsFeed.length / postsPerPage) : parseInt(newsFeed.length / postsPerPage) + 1;
 
   const source = `
     <ul>
@@ -42,16 +43,16 @@ function getNewsFeed() {
     next_page: currentPage < lastPage ? currentPage + 1 : lastPage,
   };
 
-  // ✅postsPerPage이 나누어떨어지는 숫자가 아닐때, 마지막 페이지 출력되지 않는 error 해결
-  // ✅i < newsFeed.length로 잘못 구현함.
-  // newsFeed를 slice 해서 이미 새로운(index도 새로워짐) newsFeed 배열을 만들었으므로,
-  // 이제는 newsFeed 대신 store.list를 사용해야 된다.
   for (let i = 0; i < store.list.length; i++) {
     store.list[i].individual_url = `#item?id=${store.list[i].id}`;
   }
 
   let template = Handlebars.compile(source);
   container.innerHTML = template(store);
+  header.innerHTML = `
+  <h1>
+    <a href=""><i class="fab fa-hacker-news-square"></i>Hacker News</a>
+  </h1>`;
 }
 
 // 클릭한 글의 id를 전달해서 콘텐츠 화면 불러오기
@@ -92,8 +93,8 @@ function getIndividualContents(id) {
     for (let i = 0; i < comments.length; i++) {
       commentString.push(`
         <li>
-          <div id="comment-info" style = "padding-left: ${called * 2.5}rem"}><i class="far fa-comment-alt"></i>${comments[i].user} ${comments[i].time_ago}</div>
-          <div style = "padding-left: ${called * 2.5}rem">${comments[i].content}</div>
+          <div id="comment-info" style = "padding-left: ${called * 1.5}rem"}><i class="far fa-comment-alt"></i>${comments[i].user} ${comments[i].time_ago}</div>
+          <div style = "padding-left: ${called * 1.5}rem">${comments[i].content}</div>
         </li> 
     `);
       if (comments[i].comments_count > 0) {
@@ -104,6 +105,14 @@ function getIndividualContents(id) {
   }
 
   document.querySelector(".container ul").innerHTML = makeComments(contents.comments);
+  header.innerHTML = `
+    <h1>
+      <a href=""><i class="fab fa-hacker-news-square"></i>Hacker News</a>
+    </h1>
+    <div title="뒤로가기">
+      <a href="#"><i class="fas fa-arrow-circle-left"></i></a>
+    </div>
+  `;
 }
 
 // 라우터 구현

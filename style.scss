@@ -28,8 +28,12 @@ body {
 }
 
 header {
-  h1 {
-    margin: 0 auto;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  display: flex;
+  justify-content: space-between;
+  h1,
+  div {
+    margin: 0;
     padding: 1rem;
     font-size: 2rem;
     i {
@@ -39,7 +43,13 @@ header {
   a {
     color: #3a0fc0;
   }
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+  div a i {
+    transition: all 0.3s ease-in;
+    &:hover {
+      color: #7251d4;
+    }
+  }
 }
 
 .container {
